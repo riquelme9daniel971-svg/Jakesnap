@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Jakesnap" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFEB3B</item>
+        <item name="android:navigationBarColor">#FFEB3B</item>
+        <item name="android:windowBackground">#FFEB3B</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

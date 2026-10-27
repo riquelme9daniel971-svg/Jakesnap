@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jakesnap</string>
+    <string name="share_hint">Compartilhe um link do YouTube para baixar</string>
+    <string name="obtaining_info">Obtendo informações...</string>
+    <string name="downloading">Baixando...</string>
+    <string name="merging">Juntando áudio e vídeo...</string>
+    <string name="finalizing">Finalizando...</string>
+    <string name="completed">Download concluído!</string>
+    <string name="open_lark">▶ Abrir no Lark Player</string>
+    <string name="retry">Tentar novamente</string>
+    <string name="error_invalid_url">Link inválido. Compartilhe um link do YouTube.</string>
+    <string name="error_download">Erro no download. Tente novamente.</string>
+    <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
+</resources>
