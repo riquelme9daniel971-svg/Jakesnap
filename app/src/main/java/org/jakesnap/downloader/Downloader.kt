@@ -23,7 +23,7 @@ object Downloader {
     data class VideoMeta(
         val title: String,
         val thumbnail: String?,
-        val duration: Long, // seconds
+        val duration: Long,
         val url: String
     )
 
@@ -59,7 +59,7 @@ object Downloader {
         val outputTemplate = File(cacheDir, "%(title).200B.%(ext)s").absolutePath
 
         val request = YoutubeDLRequest(url).apply {
-            addOption("-f", "best[ext=mp4][height<=720]/best[ext=mp4][height<=720]/best[ext=mp4]/best")
+            addOption("-f", "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best[height<=720]/best")
             addOption("--merge-output-format", "mp4")
             addOption("--concurrent-fragments", "16")
             addOption("--no-part")
@@ -93,18 +93,15 @@ object Downloader {
             throw Exception("yt-dlp exit code ${response.exitCode}: ${response.err}")
         }
 
-        // Find the downloaded file
         val downloadedFile = cacheDir.listFiles()
             ?.filter { it.isFile && (it.extension.equals("mp4", true) || it.extension.equals("mkv", true) || it.extension.equals("webm", true)) }
             ?.maxByOrNull { it.lastModified() }
             ?: throw Exception("Arquivo baixado não encontrado")
 
-        // Move to MediaStore Movies/Jakesnap
         val safeTitle = title.replace(Regex("[\\\\/:*?\"<>|]"), "_").take(80)
         val finalName = "${safeTitle}.mp4"
 
         val uri = saveToMediaStore(context, downloadedFile, finalName)
-        // Clean cache
         try { downloadedFile.delete() } catch (_: Exception) {}
 
         DownloadResult(uri, null)
