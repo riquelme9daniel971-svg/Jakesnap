@@ -59,9 +59,10 @@ object Downloader {
         val outputTemplate = File(cacheDir, "%(title).200B.%(ext)s").absolutePath
 
         val request = YoutubeDLRequest(url).apply {
-            addOption("-f", "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best[height<=720]/best")
+            // Formato bem mais flexível
+            addOption("-f", "best[height<=720]/bestvideo[height<=720]+bestaudio/best")
             addOption("--merge-output-format", "mp4")
-            addOption("--concurrent-fragments", "16")
+            addOption("--concurrent-fragments", "8")
             addOption("--no-part")
             addOption("--no-mtime")
             addOption("--no-playlist")
@@ -69,32 +70,28 @@ object Downloader {
             addOption("--retries", "10")
             addOption("--fragment-retries", "10")
             addOption("--socket-timeout", "30")
-            addOption("--http-chunk-size", "10M")
             addOption("--extractor-args", "youtube:player_client=android,web")
             addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             addOption("-o", outputTemplate)
         }
 
-        var lastStatus = "Baixando..."
         val response: YoutubeDLResponse = YoutubeDL.getInstance().execute(request, null) { progress, eta, line ->
             val status = when {
-                line.contains("Merging", ignoreCase = true) ||
-                line.contains("Destination", ignoreCase = true) && line.contains("mp4") -> "Juntando áudio e vídeo..."
+                line.contains("Merging", ignoreCase = true) -> "Juntando áudio e vídeo..."
                 line.contains("Deleting", ignoreCase = true) -> "Finalizando..."
                 progress >= 99f -> "Finalizando..."
                 else -> "Baixando..."
             }
-            lastStatus = status
             onProgress(progress.coerceIn(0f, 100f), status)
             Log.d(TAG, "Progress: $progress% | $line")
         }
 
         if (response.exitCode != 0) {
-            throw Exception("yt-dlp exit code ${response.exitCode}: ${response.err}")
+            throw Exception("Erro no download: ${response.err.take(200)}")
         }
 
         val downloadedFile = cacheDir.listFiles()
-            ?.filter { it.isFile && (it.extension.equals("mp4", true) || it.extension.equals("mkv", true) || it.extension.equals("webm", true)) }
+            ?.filter { it.isFile && (it.extension.equals("mp4", true) || it.extension.equals("mkv", true) || it.extension.equals("webm", true) || it.extension.equals("m4a", true)) }
             ?.maxByOrNull { it.lastModified() }
             ?: throw Exception("Arquivo baixado não encontrado")
 
